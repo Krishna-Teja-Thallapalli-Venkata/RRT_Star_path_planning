@@ -53,20 +53,20 @@ For a predefined number of `max_iterations` or until a satisfactory path to the 
 
 1.  **Random Sample ( `generateRandomPoint` ):**
     *   Generate a random point (`random_point`) within the confines of the grid.
-    *   A "goal bias" is introduced: occasionally (e.g., 10% of the time), `random_point` is set to the `end_pt_` directly to encourage growth towards the end.
+    *   A "goal bias" is introduced: occasionally (e.g., 10% of the time), `random_point` is set to the `end_pt` directly to encourage growth towards the end.
 
 2.  **Find Nearest Node ( `findNearestNode` ):**
-    *   Search the existing tree (`nodes_`) to find the node (`nearest_node`) closest to `random_point`.
+    *   Search the existing tree (`nodes`) to find the node (`nearest_node`) closest to `random_point`.
 
 3.  **Steer ( `steer` ):**
     *   Generate a new point (`new_point`) by "steering" from `nearest_node.point` towards `random_point`.
-    *   The `new_point` is at most `step_size_` distance away from `nearest_node.point` along the direction of `random_point`. If `random_point` is closer than `step_size_`, `new_point` becomes `random_point`.
+    *   The `new_point` is at most `step_size` distance away from `nearest_node.point` along the direction of `random_point`. If `random_point` is closer than `step_size`, `new_point` becomes `random_point`.
 
 4.  **Collision Check ( `isCollisionFree` ):**
     *   Verify if the straight-line path segment between `nearest_node.point` and `new_point` is free of obstacles. If a collision occurs, this iteration is aborted, and the process restarts from Step 1.
 
 5.  **Find Near Nodes ( `findNearNodes` ):**
-    *   Identify all existing nodes (`near_nodes`) in the tree that are within a `search_radius_` of `new_point`. This set will be used for choosing the best parent and for rewiring.
+    *   Identify all existing nodes (`near_nodes`) in the tree that are within a `search_radius` of `new_point`. This set will be used for choosing the best parent and for rewiring.
 
 6.  **Choose Parent (Core RRT* Step):**
     *   Initialize `best_parent` to `nearest_node`. The initial cost to reach `new_point` is `nearest_node.cost + distance(nearest_node.point, new_point)`.
@@ -74,9 +74,9 @@ For a predefined number of `max_iterations` or until a satisfactory path to the 
         *   If a collision-free path exists from `near_node_candidate.point` to `new_point`:
             *   Calculate the cost to reach `new_point` via `near_node_candidate` (`near_node_candidate.cost + distance(near_node_candidate.point, new_point)`).
             *   If this cost is lower than the current best cost to `new_point`, update `best_parent` to `near_node_candidate` and update the minimum cost.
-    *   Create a `new_node` at `new_point`. Set its parent to `best_parent` and its cost to the calculated minimum cost. Add `new_node` to the tree (`nodes_`) and as a child of `best_parent`.
+    *   Create a `new_node` at `new_point`. Set its parent to `best_parent` and its cost to the calculated minimum cost. Add `new_node` to the tree (`nodes`) and as a child of `best_parent`.
 
-7. **Rewire Tree (Core RRT* Step):**
+7. **Rewire Tree (Core RRTStar Step):**
     *   Iterate through all nodes in `near_nodes` (excluding `new_node`'s actual parent). For each `near_node_to_rewire`:
         *   If a collision-free path exists from `new_point` to `near_node_to_rewire.point`:
             *   Calculate the potential new cost for `near_node_to_rewire` if it were parented by `new_node` (`new_node.cost + distance(new_point, near_node_to_rewire.point)`).
@@ -87,15 +87,15 @@ For a predefined number of `max_iterations` or until a satisfactory path to the 
                 *   Recursively update the costs of all descendants of `near_node_to_rewire` ( `updateCosts` function).
 
 8.  **Check End Reached:**
-    *   If `new_point` is within `step_size_` of `end_pt_` and the path from `new_point` to `end_pt_` is collision-free:
-        *   A potential path to the end has been found. A `end_node_` is created (or updated if a previous, more costly path to end existed).
+    *   If `new_point` is within `step_size` of `end_pt` and the path from `new_point` to `end_pt` is collision-free:
+        *   A potential path to the end has been found. A `end_node` is created (or updated if a previous, more costly path to end existed).
         *   The algorithm continues to run for the remaining iterations to potentially find even better paths to the end through the rewiring process.
 
-The algorithm terminates after `max_iterations_`. The best path found to `end_node_` (if any) is then reconstructed.
+The algorithm terminates after `max_iterations`. The best path found to `end_node` (if any) is then reconstructed.
 
 ## **Environment Representation**
-The 2D environment is modeled as a grid (`std::vector<std::vector<bool>> grid_`).
-*   Each cell `grid_[y][x]` can be `true` (obstacle) or `false` (free space).
+The 2D environment is modeled as a grid (`std::vector<std::vector<bool>> grid`).
+*   Each cell `grid[y][x]` can be `true` (obstacle) or `false` (free space).
 *   Coordinates are typically treated as `double` for point calculations and then cast to `int` for grid lookups.
 *   Points outside the grid boundaries are implicitly considered obstacles.
 
@@ -153,7 +153,7 @@ Generated in the directory from which the executable is run (typically `build/bi
 The OpenCV window displays:
 *   **Background:** White, representing free traversable space.
 *   **Obstacles:** Solid black rectangular areas.
-*   **RRT* Tree:**
+*   **RRTStar Tree:** 
     *   **Edges:** Light gray lines connecting parent nodes to their children.
     *   **Nodes:** Small dark gray circles (drawing can be toggled in `visualizer.cpp` for clarity on large trees).
 *   **Start Point:** A larger blue circle.
@@ -171,7 +171,7 @@ Below is reference output:
 
 The source code (`.h` and `.cpp` files in `src/`) includes Doxygen-compatible comments.
 To generate HTML documentation:
-1.  Ensure Doxygen (and optionally Graphviz for diagrams) is installed.
+1.  Ensure Doxygen is installed.
 2.  Navigate to the project's root directory.
 3.  Run the command: `doxygen Doxyfile`
 4.  Open `doxygen_output/html/index.html` in a web browser.
