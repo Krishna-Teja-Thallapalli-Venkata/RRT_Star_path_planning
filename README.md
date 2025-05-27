@@ -16,9 +16,9 @@ A complete C++ implementation of the RRT* (Rapidly-exploring Random Tree Star) a
 - **Doxygen Documentation**: Supports Doxygen for automatic API documentation generation.
 
 ## Project Structure
-
+```text
 RRT-Star_path_planning/
-├── src/ # Source files
+├── src/ # Source files.
 │ ├── main.cpp # Main application entry point, setup, and demo logic
 │ ├── point.h # Definition of the Point structure
 │ ├── node.h # Definition of the Node structure
@@ -32,3 +32,4 @@ RRT-Star_path_planning/
 ├── build.bat # Windows batch script for easy building
 ├── README.md # Quick overview and setup instructions
 ├── .gitignore
+```
